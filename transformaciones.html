@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transformaciones en el plano con GeoGebra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://www.geogebra.org/apps/deployggb.js"></script>
+<style>
+:root{
+  --papel:#F3F6F8; --hoja:#FFFFFF; --tinta:#1F2A44; --suave:#5B6478; --linea:#D5DCE4;
+  --azul:#185FA5; --azul-claro:#E3EEF8; --naranja:#C2410C; --naranja-claro:#FDEBDD;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --papel:#141A24; --hoja:#1C2431; --tinta:#E6EBF2; --suave:#A3ADBD; --linea:#334055;
+    --azul:#6AA8E8; --azul-claro:#1F3349; --naranja:#F59E6B; --naranja-claro:#3A2418;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--papel);color:var(--tinta);line-height:1.5;font-size:16px}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--azul);outline-offset:2px}
+header{max-width:1240px;margin:0 auto;padding:26px 20px 10px}
+header h1{margin:0;font-size:clamp(1.5rem,3.5vw,2.1rem);line-height:1.15}
+header p{margin:4px 0 0;color:var(--suave)}
+.app{max-width:1240px;margin:0 auto;padding:12px 20px 40px;display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}
+.panel{background:var(--hoja);border:1px solid var(--linea);border-radius:12px;padding:16px}
+.modos{display:grid;gap:6px;margin:0 0 14px;padding:0;border:0}
+.modos legend{font-weight:700;margin-bottom:6px}
+.modo{display:flex;align-items:center;gap:10px;border:1.5px solid var(--linea);border-radius:9px;padding:8px 10px;cursor:pointer}
+.modo:hover{border-color:var(--suave)}
+.modo input{accent-color:var(--azul);width:18px;height:18px;margin:0}
+.modo:has(input:checked){border-color:var(--azul);background:var(--azul-claro)}
+.regla{background:var(--naranja-claro);border-radius:9px;padding:10px 12px;margin:0 0 12px}
+.regla .t{font-size:.82rem;color:var(--suave);margin:0 0 2px}
+.regla .r{font-weight:700;font-size:1.08rem;font-variant-numeric:tabular-nums}
+.regla .r2{font-size:.92rem;color:var(--suave);margin-top:2px}
+.control{margin:0 0 12px}
+.control label{display:flex;justify-content:space-between;font-weight:700;font-size:.95rem}
+.control input[type=range]{width:100%;accent-color:var(--naranja)}
+.rapidos{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.btn{border:1px solid var(--linea);background:var(--hoja);padding:7px 12px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--suave)}
+.btn.prim{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:700}
+@media (prefers-color-scheme: dark){.btn.prim{color:#0E1620}}
+.explica{font-size:.95rem;margin:0 0 6px}
+.preguntas{font-size:.92rem;color:var(--suave);margin:6px 0 0;padding-left:18px}
+.lienzo{background:var(--hoja);border:1px solid var(--linea);border-radius:12px;padding:8px;min-height:540px}
+#ggb{width:100%}
+.cargando{padding:40px;text-align:center;color:var(--suave)}
+.debajo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start;margin-top:14px}
+table{border-collapse:collapse;width:100%;background:var(--hoja);border:1px solid var(--linea);border-radius:10px;overflow:hidden;font-variant-numeric:tabular-nums}
+th,td{padding:7px 12px;border-bottom:1px solid var(--linea);text-align:center}
+th{background:var(--papel);font-size:.88rem;color:var(--suave)}
+td.pre{color:var(--azul);font-weight:700} td.img{color:var(--naranja);font-weight:700}
+.acciones{display:grid;gap:8px}
+.nota{font-size:.85rem;color:var(--suave);margin-top:10px}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .debajo{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Transformaciones en el plano</h1>
+  <p>Elija una transformación, arrastre los vértices azules y observe cómo cambia la imagen naranja.</p>
+</header>
+
+<div class="app">
+  <aside class="panel">
+    <fieldset class="modos" id="modos">
+      <legend>Transformación</legend>
+      <label class="modo"><input type="radio" name="modo" value="T" checked> Traslación</label>
+      <label class="modo"><input type="radio" name="modo" value="X"> Reflexión en el eje x</label>
+      <label class="modo"><input type="radio" name="modo" value="Y"> Reflexión en el eje y</label>
+      <label class="modo"><input type="radio" name="modo" value="D"> Reflexión en la recta y = x</label>
+      <label class="modo"><input type="radio" name="modo" value="R"> Rotación con centro en el origen</label>
+      <label class="modo"><input type="radio" name="modo" value="H"> Homotecia</label>
+    </fieldset>
+
+    <div class="regla"><p class="t">Regla</p><div class="r" id="regla"></div><div class="r2" id="regla2"></div></div>
+
+    <div class="control" id="ctlRot" hidden>
+      <label for="ang"><span>Ángulo</span><span id="angTxt"></span></label>
+      <input type="range" id="ang" min="-360" max="360" step="15" value="90">
+      <div class="rapidos">
+        <button class="btn" type="button" data-ang="90">90° antihoraria</button>
+        <button class="btn" type="button" data-ang="-90">90° horaria</button>
+        <button class="btn" type="button" data-ang="180">180°</button>
+      </div>
+    </div>
+    <div class="control" id="ctlHom" hidden>
+      <label for="raz"><span>Razón k</span><span id="razTxt"></span></label>
+      <input type="range" id="raz" min="-3" max="3" step="0.5" value="2">
+    </div>
+
+    <p class="explica" id="explica"></p>
+    <ul class="preguntas" id="preguntas"></ul>
+  </aside>
+
+  <section>
+    <div class="lienzo"><div id="ggb"><div class="cargando">Cargando GeoGebra… (se necesita conexión a internet)</div></div></div>
+    <div class="debajo">
+      <table aria-live="polite">
+        <thead><tr><th>Vértice</th><th>Preimagen</th><th>Imagen</th></tr></thead>
+        <tbody id="tabla"></tbody>
+      </table>
+      <div class="acciones">
+        <button class="btn" id="btnReset" type="button">Restablecer la figura</button>
+        <button class="btn prim" id="btnGgb" type="button">Descargar archivo .ggb</button>
+      </div>
+    </div>
+    <p class="nota">El archivo .ggb se descarga con la transformación que esté seleccionada y se abre en GeoGebra Classic. Dentro de GeoGebra puede usar los nombres de los objetos: g es el ángulo de rotación y k la razón de homotecia.</p>
+  </section>
+</div>
+
+<script>
+/* ---------------- Construcción en GeoGebra ---------------- */
+const AZUL = "#185FA5", NARANJA = "#C2410C", GRIS = "#8A93A5";
+const CMD = [
+  "ZoomIn(-9,-7,11,8)", "ShowGrid(true)", "ShowAxes(true)",
+  "A=(1,1)", "B=(4,1)", "C=(2,3)",
+  "pol=Polygon({A,B,C})",
+  // Traslación
+  "V=(5,-4)", "u=Vector(V)",
+  "At=Translate(A,u)", "Bt=Translate(B,u)", "Ct=Translate(C,u)", "polT=Polygon({At,Bt,Ct})",
+  // Reflexiones
+  "Ax=Reflect(A,xAxis)", "Bx=Reflect(B,xAxis)", "Cx=Reflect(C,xAxis)", "polX=Polygon({Ax,Bx,Cx})",
+  "Ay=Reflect(A,yAxis)", "By=Reflect(B,yAxis)", "Cy=Reflect(C,yAxis)", "polY=Polygon({Ay,By,Cy})",
+  "d=Line((0,0),(1,1))",
+  "Ad=Reflect(A,d)", "Bd=Reflect(B,d)", "Cd=Reflect(C,d)", "polD=Polygon({Ad,Bd,Cd})",
+  // Rotación (centro en el origen)
+  "g=90", "Oc=(0,0)",
+  "Ar=Rotate(A,g°,Oc)", "Br=Rotate(B,g°,Oc)", "Cr=Rotate(C,g°,Oc)", "polR=Polygon({Ar,Br,Cr})",
+  // Homotecia
+  "k=2", "H=(0,0)",
+  "Ah=Dilate(A,k,H)", "Bh=Dilate(B,k,H)", "Ch=Dilate(C,k,H)", "polH=Polygon({Ah,Bh,Ch})",
+  "lA=Line(H,A)", "lB=Line(H,B)", "lC=Line(H,C)"
+];
+const GRUPOS = {
+  T: ["polT","At","Bt","Ct","u","V"],
+  X: ["polX","Ax","Bx","Cx"],
+  Y: ["polY","Ay","By","Cy"],
+  D: ["polD","Ad","Bd","Cd","d"],
+  R: ["polR","Ar","Br","Cr","Oc"],
+  H: ["polH","Ah","Bh","Ch","H","lA","lB","lC"]
+};
+const SUF = {T:"t", X:"x", Y:"y", D:"d", R:"r", H:"h"};
+let api = null, modo = "T";
+
+function estilo(){
+  const ev = c => api.evalCommand(c);
+  ev(`SetColor(pol,"${AZUL}")`); ev("SetFilling(pol,0.25)"); ev("SetLineThickness(pol,6)"); ev("ShowLabel(pol,false)");
+  ["A","B","C"].forEach(p => { ev(`SetColor(${p},"${AZUL}")`); ev(`SetPointSize(${p},6)`); ev(`ShowLabel(${p},true)`); });
+  Object.entries(GRUPOS).forEach(([m,objs]) => {
+    const s = SUF[m], poly = "pol" + m;
+    ev(`SetColor(${poly},"${NARANJA}")`); ev(`SetFilling(${poly},0.25)`); ev(`SetLineThickness(${poly},6)`); ev(`ShowLabel(${poly},false)`);
+    ["A","B","C"].forEach(p => {
+      const n = p + s;
+      ev(`SetColor(${n},"${NARANJA}")`); ev(`SetPointSize(${n},5)`);
+      ev(`SetCaption(${n},"${p}'")`); ev(`SetLabelMode(${n},3)`); ev(`ShowLabel(${n},true)`);
+    });
+  });
+  ev(`SetColor(V,"${NARANJA}")`); ev(`SetPointSize(V,6)`); ev(`SetCaption(V,"V")`); ev(`ShowLabel(V,true)`);
+  ev(`SetColor(u,"${NARANJA}")`); ev("SetLineThickness(u,5)"); ev(`SetCaption(u,"vector")`); ev("ShowLabel(u,false)");
+  ev(`SetColor(d,"${GRIS}")`); ev("SetLineStyle(d,1)"); ev(`SetCaption(d,"y = x")`); ev("SetLabelMode(d,3)"); ev("ShowLabel(d,true)");
+  ev(`SetColor(Oc,"#1F2A44")`); ev("SetFixed(Oc,true)"); ev(`SetCaption(Oc,"O")`); ev("SetLabelMode(Oc,3)"); ev("ShowLabel(Oc,true)");
+  ev(`SetColor(H,"#1F2A44")`); ev(`SetPointSize(H,6)`); ev(`SetCaption(H,"H")`); ev("SetLabelMode(H,3)"); ev("ShowLabel(H,true)");
+  ["lA","lB","lC"].forEach(l => { ev(`SetColor(${l},"${GRIS}")`); ev(`SetLineStyle(${l},1)`); ev(`ShowLabel(${l},false)`); });
+  ev("ShowLabel(g,false)"); ev("ShowLabel(k,false)");
+  api.setVisible("g", false); api.setVisible("k", false);
+}
+
+function mostrarModo(){
+  if(!api) return;
+  Object.entries(GRUPOS).forEach(([m,objs]) => objs.forEach(o => api.setVisible(o, m === modo)));
+  document.getElementById("ctlRot").hidden = modo !== "R";
+  document.getElementById("ctlHom").hidden = modo !== "H";
+  actualizar();
+}
+
+/* ---------------- Textos de apoyo ---------------- */
+const TEXTOS = {
+  T: {exp:"Toda la figura se desliza según el vector que va del origen al punto V. Arrastre V para cambiar el vector.",
+      preg:["¿Cambian la forma o el tamaño del triángulo?","¿Los lados de la imagen son paralelos a los de la preimagen?","¿Qué vector devolvería la figura a su lugar?"]},
+  X: {exp:"El eje x funciona como un espejo: la x se mantiene y la y cambia de signo.",
+      preg:["¿Qué pasa si arrastra un vértice hasta el eje x?","Recorra los vértices A, B, C: ¿la imagen se recorre en el mismo sentido?"]},
+  Y: {exp:"El eje y funciona como un espejo: la y se mantiene y la x cambia de signo.",
+      preg:["¿Cuál coordenada cruza el espejo?","¿Qué puntos quedan fijos en esta reflexión?"]},
+  D: {exp:"En la recta y = x las coordenadas se intercambian: (x, y) pasa a ser (y, x).",
+      preg:["¿Qué pasa con un punto que está sobre la recta y = x?","¿El segmento que une A con A′ es perpendicular a la recta?"]},
+  R: {exp:"La figura gira alrededor del origen O. Un ángulo positivo gira en sentido antihorario y uno negativo en sentido horario.",
+      preg:["Compare 90° antihoraria con 90° horaria: ¿dónde queda A′ en cada caso?","¿Qué ángulo deja la figura en su posición original?","¿Qué relación hay entre la rotación de 180° y las reflexiones en los dos ejes?"]},
+  H: {exp:"La figura se agranda o reduce desde el centro H. Cada vértice, su imagen y H quedan sobre la misma recta. Arrastre H para cambiar el centro.",
+      preg:["¿Qué pasa con la figura si k está entre 0 y 1?","¿Y si k es negativa?","Con k = 2, ¿cuántas veces mayor es el área de la imagen?"]}
+};
+const fmt = v => (Math.round(v*100)/100).toLocaleString("es-CR");
+const par = (x,y) => `(${fmt(x)}, ${fmt(y)})`;
+
+function reglaTexto(){
+  const g = +document.getElementById("ang").value, k = +document.getElementById("raz").value;
+  switch(modo){
+    case "T": { const a = api.getXcoord("V"), b = api.getYcoord("V");
+      return ["(x, y) → (x + a, y + b)", `Con el vector (${fmt(a)}, ${fmt(b)}): (x, y) → (x ${a<0?"−":"+"} ${fmt(Math.abs(a))}, y ${b<0?"−":"+"} ${fmt(Math.abs(b))})`]; }
+    case "X": return ["(x, y) → (x, −y)", "La x se mantiene; la y cambia de signo."];
+    case "Y": return ["(x, y) → (−x, y)", "La y se mantiene; la x cambia de signo."];
+    case "D": return ["(x, y) → (y, x)", "Las coordenadas se intercambian."];
+    case "R": { const n = ((g % 360) + 360) % 360;
+      const r = n === 90 ? "(x, y) → (−y, x)" : n === 270 ? "(x, y) → (y, −x)" : n === 180 ? "(x, y) → (−x, −y)" : n === 0 ? "(x, y) → (x, y)" : `Rotación de ${g}°`;
+      const s = g > 0 ? `${g}° en sentido antihorario` : g < 0 ? `${-g}° en sentido horario` : "Sin giro";
+      return [r, s]; }
+    case "H": { const hx = api.getXcoord("H"), hy = api.getYcoord("H");
+      const enOrigen = Math.abs(hx) < 1e-9 && Math.abs(hy) < 1e-9;
+      return [enOrigen ? `(x, y) → (${fmt(k)}x, ${fmt(k)}y)` : `Centro H${par(hx,hy)}, razón ${fmt(k)}`,
+              enOrigen ? "Con centro en el origen, cada coordenada se multiplica por k." : "La regla (kx, ky) solo vale con centro en el origen."]; }
+  }
+}
+function actualizar(){
+  if(!api) return;
+  const [r1, r2] = reglaTexto();
+  document.getElementById("regla").textContent = r1;
+  document.getElementById("regla2").textContent = r2;
+  document.getElementById("explica").textContent = TEXTOS[modo].exp;
+  document.getElementById("preguntas").innerHTML = TEXTOS[modo].preg.map(p => `<li>${p}</li>`).join("");
+  const s = SUF[modo];
+  document.getElementById("tabla").innerHTML = ["A","B","C"].map(p =>
+    `<tr><td>${p} → ${p}′</td><td class="pre">${par(api.getXcoord(p), api.getYcoord(p))}</td><td class="img">${par(api.getXcoord(p+s), api.getYcoord(p+s))}</td></tr>`).join("");
+  const g = +document.getElementById("ang").value;
+  document.getElementById("angTxt").textContent = `${g}°`;
+  document.getElementById("razTxt").textContent = fmt(+document.getElementById("raz").value);
+}
+window.alActualizar = () => actualizar();
+
+/* ---------------- Controles ---------------- */
+document.querySelectorAll("input[name=modo]").forEach(r => r.addEventListener("change", e => { modo = e.target.value; mostrarModo(); }));
+document.getElementById("ang").addEventListener("input", e => { if(api) api.setValue("g", +e.target.value); actualizar(); });
+document.querySelectorAll("[data-ang]").forEach(b => b.addEventListener("click", () => {
+  const v = +b.dataset.ang; document.getElementById("ang").value = v; if(api) api.setValue("g", v); actualizar();
+}));
+document.getElementById("raz").addEventListener("input", e => { if(api) api.setValue("k", +e.target.value); actualizar(); });
+document.getElementById("btnReset").addEventListener("click", () => {
+  if(!api) return;
+  api.setCoords("A",1,1); api.setCoords("B",4,1); api.setCoords("C",2,3);
+  api.setCoords("V",5,-4); api.setCoords("H",0,0);
+  api.setValue("g",90); api.setValue("k",2);
+  document.getElementById("ang").value = 90; document.getElementById("raz").value = 2;
+  api.evalCommand("ZoomIn(-9,-7,11,8)");
+  actualizar();
+});
+document.getElementById("btnGgb").addEventListener("click", () => {
+  if(!api) return;
+  const descargar = b64 => {
+    const bin = atob(b64), bytes = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([bytes], {type:"application/vnd.geogebra.file"}));
+    a.download = "transformaciones_en_el_plano.ggb"; document.body.appendChild(a); a.click(); a.remove();
+  };
+  let hecho = false;
+  const unaVez = b64 => { if(!hecho && b64){ hecho = true; descargar(b64); } };
+  const r = api.getBase64(unaVez);
+  if(typeof r === "string") unaVez(r);
+});
+
+/* ---------------- Carga del applet ---------------- */
+function crearApplet(){
+  if(typeof GGBApplet === "undefined"){
+    document.getElementById("ggb").innerHTML = '<div class="cargando">No se pudo cargar GeoGebra. Revise la conexión a internet y recargue la página.</div>';
+    return;
+  }
+  const cont = document.querySelector(".lienzo");
+  const ancho = Math.max(300, cont.clientWidth - 16);
+  const alto = Math.max(420, Math.min(620, Math.round(ancho * 0.72)));
+  const params = {
+    appName:"classic", width:ancho, height:alto, perspective:"G",
+    showToolBar:false, showAlgebraInput:false, showMenuBar:false, showResetIcon:false,
+    enableShiftDragZoom:true, enableRightClick:false, language:"es", borderColor:"#FFFFFF",
+    appletOnLoad: function(a){
+      api = a;
+      CMD.forEach(c => api.evalCommand(c));
+      estilo();
+      api.registerUpdateListener("alActualizar");
+      mostrarModo();
+    }
+  };
+  new GGBApplet(params, true).inject("ggb");
+}
+window.addEventListener("load", crearApplet);
+</script>
+</body>
+</html>
